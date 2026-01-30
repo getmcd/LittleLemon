@@ -73,12 +73,39 @@ WSGI_APPLICATION = 'littlelemon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'reservations',
+#         'HOST' : '127.0.0.1',
+#         'PORT' : '3306',
+#         'USER' : 'root',
+#         'PASSWORD' : '@!21WQwqSAsaXZxz%#!',
+#     }
+# }
+
+#Settings.py 
+DATABASES = {   
+    'default': {   
+        'ENGINE': 'django.db.backends.mysql',   
+        'NAME': 'LittleLemon',   
+        'USER': 'root',   
+        'PASSWORD': '@!21WQwqSAsaXZxz%#!',   
+        'HOST': '127.0.0.1',   
+        'PORT': '3306',   
+        'OPTIONS': {   
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"   
+        }   
+    }   
 }
+
 
 
 # Password validation
@@ -105,10 +132,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+#TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+# USE_TZ = True
+
+# 1. Set this to your local time zone
+TIME_ZONE = 'America/Los_Angeles'  # Examples: 'Europe/London', 'Asia/Kolkata', etc.
+
+# 2. Keep this as True
 USE_TZ = True
 
 
