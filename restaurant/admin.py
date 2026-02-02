@@ -13,6 +13,13 @@ class BookingAdmin(admin.ModelAdmin):
 # 2. Register them at the bottom
 admin.site.register(Menu, MenuAdmin)
 admin.site.register(Booking, BookingAdmin)
+
+# Important
+# For the HTML Form (Meta course assignment): If you are building 
+# an HTML form manually, make sure your <input> tag is set to datetime-local:
+# <input type="datetime-local" id="booking_date" name="booking_date">
     
+    
+
     
         
