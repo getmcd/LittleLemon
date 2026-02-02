@@ -19,6 +19,15 @@ class Menu(models.Model):
 #   previous function get_local_now().   Threw error.  
 #     AttributeError: module 'restaurant.models' has no 
 #     attribute 'get_local_now' 
+#
+# Here is why timezone.now is better than datetime.now.
+# datetime.now() # is "naive," meaning it doesn't know about UTC or Daylight Savings.
+# timezone.now() is "aware." It uses the TIME_ZONE setting in your settings.py (e.g.,
+# 'UTC' or 'America/New_York').
+#
+# If you use naive times, your bookings might appear to be several 
+# hours off once you deploy the app to a server.
+
 def get_local_now():
     return timezone.localtime(timezone.now())
     
@@ -31,3 +40,4 @@ class Booking(models.Model):
     #booking_date = models.DateTimeField(default=datetime.now) 
     def __str__(self):
         return self.name   # 👈 this controls how it appears in admin dropdowns & FK fields    
+    
