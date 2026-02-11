@@ -12,6 +12,14 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
+# Eliminates this WARNING that appeared 3 times, once for each model:
+# restaurant.Booking: (models.W042) Auto-created primary key used when 
+# not defining a primary key type, by default 'django.db.models.AutoField'.   
+#     HINT: Configure the DEFAULT_AUTO_FIELD setting or 
+#           the RestaurantConfig.default_auto_field attribute to point 
+#           to a subclass of AutoField, e.g. 'django.db.models.BigAutoField'.
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,8 +46,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
+    'djoser',
     'restaurant',
+    'rest_framework.authtoken',
 ]
+
+# DJOSER = {
+#     "USER_ID_FIELD": "username",
+#     }
+
+# DJOSER = {
+#     "USER_ID_FIELD": "username",
+#     "LOGIN_FIELD": "username",
+# }
+
+# DJOSER = {
+#     "LOGIN_FIELD": "username",   # or "email"
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,20 +116,39 @@ WSGI_APPLICATION = 'littlelemon.wsgi.application'
 #     }
 # }
 
-#Settings.py 
-DATABASES = {   
-    'default': {   
-        'ENGINE': 'django.db.backends.mysql',   
-        'NAME': 'LittleLemon',   
-        'USER': 'root',   
-        'PASSWORD': '@!21WQwqSAsaXZxz%#!',   
-        'HOST': '127.0.0.1',   
-        'PORT': '3306',   
-        'OPTIONS': {   
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"   
-        }   
-    }   
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "LittleLemon",
+        "USER": "root",
+        "PASSWORD": "@!21WQwqSAsaXZxz%#!",
+        "HOST": "127.0.0.1",
+        "PORT": "3306",
+        "OPTIONS": {
+            # keep your strict mode
+            "init_command": (
+                "SET sql_mode='STRICT_TRANS_TABLES'; "
+                #"SET time_zone = '+00:00';"
+            )
+        },
+    }
 }
+
+
+#Settings.py 
+# DATABASES = {   
+#     'default': {   
+#         'ENGINE': 'django.db.backends.mysql',   
+#         'NAME': 'LittleLemon',   
+#         'USER': 'root',   
+#         'PASSWORD': '@!21WQwqSAsaXZxz%#!',   
+#         'HOST': '127.0.0.1',   
+#         'PORT': '3306',   
+#         'OPTIONS': {   
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"   
+#         }   
+#     }   
+# }
 
 
 
@@ -128,22 +171,123 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# REST_FRAMEWORK = {
+#     "DEFAULT_AUTHENTICATION_CLASSES": [
+#         "rest_framework.authentication.SessionAuthentication",
+#         "rest_framework.authentication.TokenAuthentication",
+#     ],
+#     "DEFAULT_PERMISSION_CLASSES": [
+#         "rest_framework.permissions.IsAuthenticated",
+#     ],
+# }
+
+# Django Rest Framework Configuration
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 5,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
+        "rest_framework.filters.SearchFilter",
+    ],
+}
+
+# Djoser Configuration
+DJOSER = {
+    "USER_ID_FIELD": "id",
+    "LOGIN_FIELD": "username",
+
+    "PERMISSIONS": {
+        # Allow anyone to register
+        "user_create": ["rest_framework.permissions.AllowAny"],
+
+        # Only admins can list users or view arbitrary user details
+        "user_list": ["rest_framework.permissions.IsAdminUser"],
+        "user": ["rest_framework.permissions.IsAdminUser"],
+
+        # Any authenticated user can view their own profile
+        "current_user": ["rest_framework.permissions.IsAuthenticated"],
+    },
+
+    "SERIALIZERS": {
+        "user_create": "djoser.serializers.UserCreateSerializer",
+        "user": "djoser.serializers.UserSerializer",
+        "current_user": "djoser.serializers.UserSerializer",
+    },
+}
+
+# DJOSER = {
+#     "USER_ID_FIELD": "username",
+#     "LOGIN_FIELD": "username",
+#     "SERIALIZERS": {
+#         "user_create": "djoser.serializers.UserCreateSerializer",
+#         "user": "djoser.serializers.UserSerializer",
+#         "current_user": "djoser.serializers.UserSerializer",
+#     },
+# }
+
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
+# UTC (Coordinated Universal Time) is the world’s time standard.
+# - It does not observe daylight saving time
+# - It never changes
+# - It’s the baseline from which all other time zones are offset
+
+# Think of UTC as the master reference clock for the planet.
+# The historical reference point.
+
+# UTC is aligned with the Prime Meridian, which passes through:
+# - Greenwich, London, United Kingdom
+
+# 12-hour clock with AM/PM, added and threw error:
+#  	GET
+# Request URL: 	http://127.0.0.1:8000/admin/restaurant/booking/add/
+# Django Version: 	5.2.4
+# Exception Type: 	ValueError
+# Exception Value: 	
+# localtime() cannot be applied to a naive datetime
+DATETIME_FORMAT = "N j, Y, P"
+TIME_FORMAT = "P"
+
 #TIME_ZONE = 'UTC'
+
+# Keep this as True
+USE_TZ = False
 
 USE_I18N = True
 
-# USE_TZ = True
-
-# 1. Set this to your local time zone
+# Set this to your local time zone
 TIME_ZONE = 'America/Los_Angeles'  # Examples: 'Europe/London', 'Asia/Kolkata', etc.
 
-# 2. Keep this as True
-USE_TZ = True
+# Controls whether Django automatically formats dates/numbers according to locale.
+# Django 4.0+ effectively ignores this (always localized)
+# Django 6 treats it as legacy
+# It does not affect timezone logic.
+#USE_L10N = False
+
+DATE_INPUT_FORMATS = ["%Y-%m-%d"]
+DATETIME_INPUT_FORMATS = ["%Y-%m-%d %I:%M %p"]
+
+
+
+
 
 
 # Static files (CSS, JavaScript, Images)
