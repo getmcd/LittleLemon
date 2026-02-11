@@ -1,0 +1,654 @@
+S/W Testing using Insomnia and DRF.
+
+Important:
+If you use endpoint /api/users/ instead of /auth/users/, you will not be able
+to use the Extra Actions Button found in Djoser URLs.  Everything else will 
+work the same, but they display DRF form fields differently.  
+- Auth endpoint puts email first and uses Djoser URLs. 
+- Api puts username first and does not use Djoser URLs.
+
+Important: using the API instead of AUTH in /users/ endpoint will prevent you from using
+9 Djoser auto-created urls clickable under Extra Actions Button.
+- Activation
+- Me
+- Resend activation
+- Reset password
+- Reset password confirm
+- Reset username
+- Reset username confirm
+- Set password
+- Set username
+
+Note: One must be authenticated and have an admin user account to do CRUD at either /users/
+endpoints, but NO authentication is required to register in POST /auth/users/ endpoint. There 
+the customer needs to POST with a username and password.
+
+- /auth/users/
+- /api/users/ 
+
+--------------------------------------------------------------------------------
+
+1.  Register, that is create a new user account using Insomnia with NO access token:
+
+POST http://127.0.0.1:8000/auth/users/
+
+JSON Payload:
+{
+	"username": "Wilma",
+	"password": "lemon@wil!"
+}
+
+JSON Output:
+{
+	"email": "",
+	"username": "Wilma",
+	"id": 9
+}
+
+HTTP Status Code: 201 Created
+Admin Panel User Status: Active, customer can register and then generate access tokens
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------------
+
+2.  Create an Authorization Token using endpoint.
+
+POST http://127.0.0.1:8000/auth/token/login/
+
+Endpoint /api/users/ cannot create an authorization token.  
+Note:  Only POST is allowed for this endpoint.
+
+JSON Body Payload:
+{
+	"username": "jen",
+	"password": "lemon@jen!"
+}
+JSON Output:
+{
+	"auth_token": "283a7b8f3434c716e81f23077116de29bfeab0b9"
+}
+
+HTTP Status Code: 200 OK
+Customer can generate Authorization tokens using /auth/token/login
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+Note: Input the Authorization Token.
+
+User: jen.  Is a non-admin account.
+NON-ADMIN Account Authorization Token:  283a7b8f3434c716e81f23077116de29bfeab0b9
+
+GET http://127.0.0.1:8000/api/users/me/
+
+You will be able to return your account.  This does not work in Djoser. 
+
+JSON Output:
+{
+	"id": 5,
+	"url": "http://127.0.0.1:8000/api/users/5/",
+	"username": "jen",
+	"email": "jen@littlelemon.com"
+}
+
+HTTP Status Code: 200 OK
+Customer can confirm they have an account, but can only see theirs, no one else's
+
+Test Result: Passed.
+--------------------------------------------------------------------------------
+
+2 a.  Display users in Insomnia. Test with admin and customer access tokens.
+Note: GET and POST only HTTP methods allowed.  POST is to register new
+accounts and was done in step 1 above.
+ 
+GET http://127.0.0.1:8000/auth/users/
+
+	Account: admin
+	HEADER Tab:
+		Authorization Token a85fb0ea4c0487a71f0b8032237907c164a231b6
+
+JSON Output:  First 13 lines.
+{
+	"count": 8,
+	"next": "http://127.0.0.1:8000/auth/users/?page=2",
+	"previous": null,
+	"results": [
+		{
+			"email": "admin@littlelemon.com",
+			"username": "admin"
+		},
+		{
+			"email": "sue@littlelemon.com",
+			"username": "sue"
+		},
+
+HTTP Status Code: 200 OK
+
+Next, Test with Customer access Token and no access token.
+	Account: customer username jen pk=5
+	HEADER
+		Authorization Token 283a7b8f3434c716e81f23077116de29bfeab0b9
+
+JSON Output with customer username jen Authorization token:
+
+HTTP Status Code: 405 Method Not Allowed
+{
+	"detail": "Method \"GET\" not allowed."
+}
+
+JSON Output with NO token:
+
+HTTP Status Code: 405 Method Not Allowed
+{
+	"detail": "Method \"GET\" not allowed."
+}
+
+Test Result: Passed.  A non-authenticated user and an authenticated customer cannot 
+access the endpoint GET /auth/users/, but an admin user can and then do CRUD, 
+POST, GET, PUT, PATCH, DELETE on the list of users. 
+
+--------------------------------------------------------------------------------
+
+2 b.  Use  /api/users/ "API" endpoint, which does not use Djoser, via your DRF ViewSet
+Admin only endpoint, but a non-admin can see their own account using /api/users/me/.      	
+Allowed HTTP methods are: GET, POST, PUT, and PATCH
+
+	Account: admin
+	HEADER Tab:
+		Authorization Token a85fb0ea4c0487a71f0b8032237907c164a231b6
+
+GET http://127.0.0.1:8000/api/users/
+
+JSON Output: First 11 lines only
+{
+	"count": 8,
+	"next": "http://127.0.0.1:8000/api/users/?page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 6,
+			"url": "http://127.0.0.1:8000/api/users/6/",
+			"username": "adam",
+			"email": "adam@littlelemon.com"
+		},
+HTTP Status Code: 200 OK, Successful GET.
+Test Result: Passed.
+
+--------------------------------------------------------------------------------
+
+GET http://127.0.0.1:8000/api/users/10/
+JSON Output:  
+{
+	"id": 10,
+	"url": "http://127.0.0.1:8000/api/users/10/",
+	"username": "tom",
+	"email": "tom@littlelemon.com"
+}
+
+HTTP Status Code: 200 OK, Successful GET on username tom.
+Test Result: Passed.
+
+--------------------------------------------------------------------------------
+
+PUT http://127.0.0.1:8000/api/users/10/
+
+Update email address by replacing tom with Sharon
+
+JSON Entry before update:
+{
+	"id": 10,
+	"url": "http://127.0.0.1:8000/api/users/10/",
+	"username": "Sharon",
+	"email": "tom@littlelemon.com"
+}
+JSON Output after update:
+{
+	"id": 10,
+	"url": "http://127.0.0.1:8000/api/users/10/",
+	"username": "Sharon",
+	"email": "sharon@littlelemon.com"
+}
+
+HTTP Status Code: 200 OK, Successful PUT on username Sharon, id=10.
+Test Result: Passed.
+
+--------------------------------------------------------------------------------
+
+PATCH http://127.0.0.1:8000/api/users/10/
+
+Update email address by replying Sharon with Sara on username and email.
+Important: Make certain you check if the selected username to update already exists.
+
+JSON Output after update:
+{
+	"id": 10,
+	"url": "http://127.0.0.1:8000/api/users/10/",
+	"username": "sara",
+	"email": "sara@littlelemon.com"
+}
+
+HTTP Status Code: 200 OK, Successful PATCH on username Sharon changed to sara.
+Test Result: Passed.
+
+DELETE http://127.0.0.1:8000/api/users/3/
+HTTP Status Code: 204 No Content.  No body returned for response.  
+Successful DELETE of tom pk=3
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------------
+
+3.  For Insomnia, get an access token by POST, plus username and password.                                 
+
+POST http://127.0.0.1:8000/api/api-token-auth/
+
+JSON INPUT Payload:
+{
+  "username": "adam",
+  "password": "lemon@adam!"
+}
+
+JSON Output:
+{
+	"token": "aa72e10ea90200dd2eeeaf5db6b2d164d47b6062"
+}
+
+Important: this is the same as the Authorization Token.
+
+HTTP Status Code: 200 OK.  Authorization Token created successfully.
+
+Test Result: Passed.
+
+================================================================================
+4.  Test Add, display or update Menu Items using both admin and non-admin accounts.
+Will test with admin, then test non-admin after that.  The non-admin account must not 
+be allowed to add, update or delete menu items.  Only admin can do that.
+--------------------------------------------------------------------------------
+	Account: admin, role admin
+	HEADER Tab:
+		Authorization Token a85fb0ea4c0487a71f0b8032237907c164a231b6
+================================================================================
+
+GET  http://127.0.0.1:8000/api/menu-items/
+
+JSON Output:
+{
+	"count": 5,
+	"next": null,
+	"previous": null,
+	"results": [
+		{
+			"id": 5,
+			"title": "beef pie",
+			"price": "5.95",
+			"inventory": 6
+		},
+HTTP Status Code: 200 OK.  Five menu items successfully retrieved.
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------
+POST  http://127.0.0.1:8000/api/menu-items/
+
+Need to check with an admin and a non-admin account.  The non-admin account must not 
+be allowed to add, update or delete menu items.  Only admin can do that.
+
+
+JSON Payload
+{
+	"title": "chicken pie",
+	"price": "5.95",
+	"inventory": 64
+}
+
+JSON Output
+{
+	"id": 7,
+	"title": "chicken pie",
+	"price": "5.95",
+	"inventory": 64
+}
+
+HTTP Status Code: 201 Created.  Menu item chicken pie successfully created.
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------
+
+GET http://127.0.0.1:8000/api/menu-items/6/
+
+JSON Output
+{
+	"id": 6,
+	"title": "Ice Cream",
+	"price": "5.95",
+	"inventory": 21
+}
+
+HTTP Status Code: 200 OK.  Retrieved and displayed Menu item 6 successfully.
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------
+
+PUT http://127.0.0.1:8000/api/menu-items/6/
+
+Update inventory to 31.
+
+JSON Output:
+{
+	"id": 6,
+	"title": "Ice Cream",
+	"price": "5.95",
+	"inventory": 31
+}
+
+HTTP Status Code: 200 OK.  Retrieved and displayed Menu item 6 successfully
+and successfully updated inventory from 21 to 31.
+
+Test Result: Passed.
+
+--------------------------------------------------------------------------
+
+PATCH http://127.0.0.1:8000/api/menu-items/6/ 
+
+JSON INPUT Payload
+{
+	"title": "chicken pie",
+	"price": "5.95",
+	"inventory": 23
+}
+
+JSON Output
+{
+	"id": 6,
+	"title": "chicken pie",
+	"price": "7.95",
+	"inventory": 33
+}
+
+HTTP Status Code: 200 OK.  Retrieved Menu item 6 and successfully updated price to $7.95.
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+DELETE http://127.0.0.1:8000/api/menu-items/3/
+
+OUTPUT
+No body returned for response
+
+HTTP Status Code: 204 No Content.  Retrieved and successfully deleted menu item 6, Strawberry Ice Cream.
+Test Result: Passed.
+
+========================================================================================
+Continue testing endpoint http://127.0.0.1:8000/api/menu-items/  
+User: jen.  Is a non-admin account.
+NON-ADMIN Account Authorization Token:  283a7b8f3434c716e81f23077116de29bfeab0b9
+========================================================================================
+
+POST http://127.0.0.1:8000/api/menu-items/
+
+JSON Payload:
+{
+	"title": "Ice Cream",
+	"price": "5.95",
+	"inventory": 20	
+}
+
+JSON OUTPUT:
+{
+	"detail": "You do not have permission to perform this action."
+}
+
+HTTP Status Code: 403 Forbidden.  Success: Non-admin accounts cannot create new menu-items
+using POST Http Method.  The custom IsAdminOrReadOnly permission worked to prevent 
+unauthorized access by non-admins
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+GET http://127.0.0.1:8000/api/menu-items/
+
+JSON Output:
+{
+	"count": 6,
+	"next": "http://127.0.0.1:8000/api/menu-items/?page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 5,
+			"title": "beef pie",
+			"price": "5.95",
+			"inventory": 6
+		},  # first 10 lines of output
+
+HTTP Status Code: 200 OK.  Retrieved and displayed all Menu items successfully.
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+GET http://127.0.0.1:8000/api/menu-items/6/
+
+JSON Output:
+{
+	"id": 6,
+	"title": "chicken pie",
+	"price": "7.95",
+	"inventory": 33
+}
+
+HTTP Status Code: 200 OK.  Retrieved and displayed Menu item 6 successfully.
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+PUT http://127.0.0.1:8000/api/menu-items/6/
+
+Update inventory to 31.
+
+JSON Payload
+{
+	"title": "chicken pie",
+	"price": "8.95",
+	"inventory": 39
+}
+JSON Output:
+{
+	"detail": "You do not have permission to perform this action."
+}
+
+HTTP Status Code: 403 Forbidden.  Success: Non-admins were blocked from updating menu items.
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+PATCH http://127.0.0.1:8000/api/menu-items/6/ 
+
+JSON INPUT Payload
+{
+	"price": "8.95",
+	"inventory": 21
+}
+
+JSON Output
+{
+	"detail": "You do not have permission to perform this action."
+}
+
+HTTP Status Code: 403 Forbidden.  Success: Non-admins were blocked from updating menu items.
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+DELETE http://127.0.0.1:8000/api/menu-items/6/
+
+JSON OUTPUT
+{
+	"detail": "You do not have permission to perform this action."
+}
+
+HTTP Status Code: 403 Forbidden.  Success: Non-admins were blocked from deleting menu items.
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+5.  Render to client an HTML 5 Template to display Welcome to Little 
+    Lemon Restaurant.
+
+http://127.0.0.1:8000/api/
+
+Output in VS Code terminal with Server status:
+"GET /api/ HTTP/1.1" 200 397
+"GET /static/img/logo.png HTTP/1.1" 304 0
+
+HTTP Status Code: 200 means web page successfully rendered, 304 means the page was not modified (cache hit).
+ 
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+6.  GET http://127.0.0.1:8000/api/message/
+
+User: jen.  Is a non-admin account.
+NON-ADMIN Account Authorization Token:  283a7b8f3434c716e81f23077116de29bfeab0b9
+
+Output in VS Code terminal with Server status:
+"GET /api/message/ HTTP/1.1" 200 10581
+
+JSON Output
+{
+	"message": "View Function msg called successfully. This msg view is protected by IsAthenticated"
+}
+
+HTTP Status Code: 200 means successfully rendered message in DRF Browsable API 
+Test Result: Passed.
+
+========================================================================================
+7.  Test POST, GET, PUT, PATCH, DELETE for endpoint http://127.0.0.1:8000/api/booking/  
+User: jen.  Is a non-admin account.
+NON-ADMIN Account Authorization Token:  283a7b8f3434c716e81f23077116de29bfeab0b9
+========================================================================================
+      
+GET http://127.0.0.1:8000/api/booking/
+
+JSON Output
+{
+	"count": 18,
+	"next": "http://127.0.0.1:8000/api/booking/?page=2",
+	"previous": null,
+	"results": [
+		{
+			"id": 16,
+			"name": "Gale",
+			"number_of_guests": 30,
+			"booking_date": "2026-03-25T21:44:00"
+		},
+
+HTTP Status Code: 200 OK. Jen successfully retrieved all Bookings. She should not be 
+allowed to do that, but requirments allowed it. She should only be allowed to see
+and update her own bookings.
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+
+POST http://127.0.0.1:8000/api/booking/
+
+JSON Input Payload
+{
+	"name": "Teresa",
+	"number_of_guests": 15,
+	"booking_date": "2026-03-24T20:44:00"
+}
+
+JSON Output
+{
+	"id": 18,
+	"name": "Teresa",
+	"number_of_guests": 15,
+	"booking_date": "2026-03-24T20:44:00"
+}
+
+HTTP Status Code: 201 Created. Jen successfully Booked a table 
+
+Test Result: Passed.
+
+---------------------------------------------------------------------------------------
+      
+GET  http://127.0.0.1:8000/api/booking/16/
+
+JSON Ouput:
+{
+	"id": 16,
+	"name": "Gale",
+	"number_of_guests": 30,
+	"booking_date": "2026-03-25T21:44:00"
+}
+
+HTTP Status Code: 200 OK. Jen successfully retrieved  Booking 16 belonging 
+to Gale, but it did not belong  to her.  Will had  code  to prevent this later.
+
+Test Result: Passed, but only on ability to retrieve a booking.
+
+---------------------------------------------------------------------------------------
+
+PUT  http://127.0.0.1:8000/api/booking/16/
+
+JSON Input Payload
+{
+	"name": "Gale",
+	"number_of_guests": 3,
+	"booking_date": "2026-03-28T21:44:00"
+}
+
+JSON Ouput:
+{
+	"id": 16,
+	"name": "Gale",
+	"number_of_guests": 3,
+	"booking_date": "2026-03-30T21:44:00"
+}
+
+HTTP Status Code: 200 OK. Jen successfully updated  number of guests and date for 
+Booking 16 belonging to Gale, but it did not belong  to her.  Will had  code  to prevent this later.
+
+Test Result: Passed, but only on ability to upadate a booking.
+
+---------------------------------------------------------------------------------------
+
+PATCH  http://127.0.0.1:8000/api/booking/16/
+
+JSON Input Payload
+{
+	"number_of_guests": 20,
+}
+
+JSON Ouput:
+{
+	"id": 16,
+	"name": "Gale",
+	"number_of_guests": 20,
+	"booking_date": "2026-03-30T21:44:00"
+}
+
+HTTP Status Code: 200 OK. Jen successfully updated  number of guests for 
+Booking 16 belonging to Gale, but it did not belong  to her.  Will had  code  to prevent this later.
+
+Test Result: Passed, but only on ability to update a booking.
+
+---------------------------------------------------------------------------------------
+
+DELETE  http://127.0.0.1:8000/api/booking/16/
+
+Ouput:
+
+HTTP Status Code:  204 No Content, No body returned for response.  Jen successfully deleted Booking 16 
+belonging to Gale, but it did not belong  to her.  Will had  code  to prevent this later.
+
+Test Result: Passed, but only on ability to delete a booking.
