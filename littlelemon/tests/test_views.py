@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
 #from restaurant.models import MenuItem
-from .models import MenuItem
+from restaurant.models import MenuItem
 
 # To test views/endpoints in Django/DRF, you typically:
 #   Create test data in setUp()
