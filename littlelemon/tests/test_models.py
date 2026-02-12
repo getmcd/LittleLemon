@@ -1,6 +1,6 @@
 # Create your tests here.
 from django.test import TestCase
-from .models import MenuItem
+from restaurant.models import MenuItem
 
 # TestCase class
 class MenuItemTest(TestCase):

@@ -652,3 +652,43 @@ HTTP Status Code:  204 No Content, No body returned for response.  Jen successfu
 belonging to Gale, but it did not belong  to her.  Will had  code  to prevent this later.
 
 Test Result: Passed, but only on ability to delete a booking.
+
+---------------------------------------------------------------------------------------
+
+Unit Testing at project level
+
+Create folder tests in project folder.  Create an empty __init__.py file in that folder.
+Next, place 2 tests scripts there: test_models.py and test_views.py
+
+Run this command in the diretory containing manage.py, which is littlelemon.
+
+You have 2 choices to run unit tests:
+1.  python manage.py test 
+2.  python manage.py test littlelemon.tests
+
+Both will work.
+
+PS C:\Capstone-project\littlelemon> python manage.py test littlelemon.tests
+Found 2 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.222s
+
+OK
+Destroying test database for alias 'default'...
+
+---------------------------------------------------------------------------------------
+
+PS C:\Capstone-project\littlelemon> python manage.py test
+Found 2 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.218s
+
+OK
+Destroying test database for alias 'default'...
+
