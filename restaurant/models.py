@@ -42,10 +42,14 @@ class MenuItem(models.Model):
     
     # The f means this is an f-string (formatted string literal).
     # It allows you to embed Python expressions inside a string using {}.
-    # def get_item(self):
-    #     return f'{self.title : {str(self.price)}}'
+    def get_item(self):
+        # return f'{self.title : {{self.price:.2f})}}'
+        return f"{self.title} : {self.price:.2f}"
+    
     def __str__(self):
-        return f"{self.title} (${self.price:.2f})"
+        # return f'{self.title : {{self.price:.2f}}}'
+        return f"{self.title} : {self.price:.2f}"
+        # return f"{self.title} (${self.price:.2f})"
 
 # Previous record in Migration History file contains a 
 # past update referencing function get_local_now().
