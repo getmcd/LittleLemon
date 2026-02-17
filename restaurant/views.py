@@ -9,13 +9,22 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 # Fix:  That login sets a session cookie (sessionid) for SessionAuthentication.
 # That forces the the view to allow SessionAuthentication
 # Insomnia end point testing requires TokenAuthenication
+
+from .permissions import IsOwnerOrAdmin
+
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated, IsAdminUser
+from rest_framework.permissions import (
+    BasePermission, 
+    SAFE_METHODS, 
+    IsAuthenticated, 
+    IsAdminUser, 
+    AllowAny 
+    )
 from rest_framework.response import Response
 
 from .models import Booking, MenuItem
 from .serializers import UserSerializer, BookingSerializer, MenuItemSerializer
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
 from .models import MenuItem
 
 # {} means render page with no dynamic data, meaning: empty dictionary.
@@ -34,7 +43,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
-    
+
+class RegistrationView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 class MenuItemsView(generics.ListCreateAPIView):
     permission_classes = [IsAdminOrReadOnly]
     queryset = MenuItem.objects.all().order_by("title")
@@ -44,17 +59,28 @@ class SingleMenuItemView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView
     permission_classes = [IsAdminOrReadOnly] 
     queryset = MenuItem.objects.all().order_by("title") 
     serializer_class = MenuItemSerializer
-    
+
+# This enforces:
+# GET list: user sees only their bookings
+# GET detail: user can only retrieve their own booking
+# PATCH/PUT/DELETE: user can only modify/delete their own booking
+# Admin: full access
 class BookingViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    # queryset = Booking.objects.all()
-    # Queryset threw Run-time Warning: UnorderedObjectListWarning: Pagination may 
-    #   yield inconsistent results with an unordered object_list: 
-    #   <class 'restaurant.models.Booking'> QuerySet.
-    # Clear warning by adding order_by clause on Booking query
-    queryset = Booking.objects.all().order_by("-booking_date", "-id")
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
     serializer_class = BookingSerializer
 
+    def get_queryset(self):
+        qs = Booking.objects.all().order_by("-booking_date", "-id")
+        # Admin sees all; users see only theirs
+        if self.request.user.is_staff:
+            return qs
+        return qs.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Force the booking owner to be the logged-in user
+        serializer.save(user=self.request.user)
+
+    
 # This is a Django REST Framework function-based DRF API view that:
 # - Only allows authenticated users
 # - Accepts only GET requests

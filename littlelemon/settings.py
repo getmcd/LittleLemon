@@ -24,6 +24,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# Browsable API only
+# The api-auth route is defined to let you use the browsable API feature of DRF.   
+# This path statement only adds the Browsable API login/logout views; don't use
+# it for any other purpose:
+#   /api-auth/login/    
+#   /api-auth/logout/
+# Prevents crashing with 404 Not Found HTTP Status code after login is successful.
+# This will render a web page welcome message.
+# Add menu-items to that endpoint and it will launch DRF Browsable API menu-items
+LOGIN_REDIRECT_URL = "/api/"
+LOGOUT_REDIRECT_URL = "/api/"
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -47,7 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'djoser',
+    'djoser',   
     'restaurant',
     'rest_framework.authtoken',
 ]

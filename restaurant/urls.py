@@ -17,5 +17,7 @@ urlpatterns = [
     path('message/', views.msg),
     
     path('api-token-auth/', obtain_auth_token),
+    
+    path("registration/", views.RegistrationView.as_view(), name="registration"),
 ]
 

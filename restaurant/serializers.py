@@ -56,14 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
             instance.save(update_fields=["password"])
 
         return instance
-
-
-# class MenuSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Menu
-#         # The 'id' is included because it's the primary key created by Django
-#         fields = ['id', 'title', 'price', 'inventory']
-        
+       
 class MenuItemSerializer(serializers.ModelSerializer):
     # price cannot be less than $2
     # This validation technique only works in DRF, not Admin Panel
@@ -78,23 +71,12 @@ class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model  = MenuItem
         fields = ['id', 'title', 'price', 'inventory']
-        
+
+# Make sure clients can’t submit user in JSON and assign bookings to someone else.
 class BookingSerializer(serializers.ModelSerializer):
-    # Guests must be between 1 and 9
-    # number_of_guests = serializers.IntegerField(
-    #     min_value=1,
-    #     max_value=9
-    #)
     class Meta:
         model = Booking
-        # The 'id' is included because it's the primary key created by Django
-        fields = '__all__'
-        
-
-# class BookingSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Booking
-#         fields = '__all__'
-#         extra_kwargs = {
-#             'booking_date': {'format': '%Y-%m-%dT%H:%M:%S'} # ISO format with time
-#         }
+        fields = "__all__"
+        extra_kwargs = {
+            "user": {"read_only": True},
+        }
