@@ -4,6 +4,7 @@ from datetime import datetime # Use standard Python datetime
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from datetime import datetime
+from django.contrib.auth.models import User
 
 # Allows developers to make logic to read and act on:
 # - settings.TIME_ZONE
@@ -53,9 +54,9 @@ class MenuItem(models.Model):
 
 # Previous record in Migration History file contains a 
 # past update referencing function get_local_now().
-# Update: booking_date = models.DateTimeField(default=datetime.now)
-#   Caused makemigrations command to fail because of that 
-#   previous function get_local_now().   Threw error.  
+#   Update: booking_date = models.DateTimeField(default=datetime.now)
+# Caused makemigrations command to fail because of that previous 
+# function get_local_now().   Threw error.  
 #     AttributeError: module 'restaurant.models' has no 
 #     attribute 'get_local_now' 
 #
@@ -76,15 +77,27 @@ def get_local_now():
         return timezone.localtime(timezone.now())  # aware
     return datetime.now()  # naive
 
+# Ensure Booking is linked to the user
 class Booking(models.Model):
     # id is automatically created by Django
+    
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="bookings",
+        # null=True,      # 👈 temp add
+        # blank=True      # 👈 temp add
+    )
+    
     name = models.CharField(max_length=255, db_index=True)
+    
     number_of_guests = models.IntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(31)],
     )
     booking_date = models.DateTimeField(default=get_local_now)
+    
     # datetime.now() grabs the system clock time without tSimezone info
     #booking_date = models.DateTimeField(default=datetime.now) 
     def __str__(self):

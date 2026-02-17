@@ -38,10 +38,10 @@ class MenuViewTest(TestCase):
 
         # self.assertEqual(len(data), 2) verifies that the API returned two menu 
         # items, matching the two objects created in the test setup().
-        # ✔ Your view is connected
-        # ✔ Database objects exist
-        # ✔ Queryset is correct
-        # ✔ Serialization worked
+        # - View is connected
+        # - Database objects exist
+        # - Queryset is correct
+        # - Serialization worked
         self.assertEqual(len(data), 2)
 
         # Because you order_by("title"), Burger comes before IceCream
