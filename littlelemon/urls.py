@@ -17,28 +17,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
-from rest_framework import routers
-
 from restaurant import views
+from rest_framework.routers import DefaultRouter
 
 # routers.DefaultRouter() is part of Django REST Framework’s automatic URL 
 # routing system.  It creates an object that automatically generates RESTful 
 # API URL patterns from registered ViewSets, eliminating the need to manually 
 # define paths for standard CRUD operations.
-router = routers.DefaultRouter()
 
 # It builds URL patterns for your API for you, based on ViewSets, so you don’t have to
 # manually write path() entries for each CRUD operation.
-# users endpoint to support full CRUD
+# users, booking and menu endpoints to support full CRUD
+
+router = DefaultRouter()
+
+# URL examples follow.
+
 # http://127.0.0.1:8000/auth/users/
 # http://127.0.0.1:8000/auth/users/3
 router.register(r'users', views.UserViewSet)
 
 # http://127.0.0.1:8000/api/booking/
 # http://127.0.0.1:8000/api/booking/3
-#router.register(r'booking', views.BookingViewSet)
+
 router.register(r"booking", views.BookingViewSet, basename="booking")
+
+# http://127.0.0.1:8000/api/menu/
+# http://127.0.0.1:8000/api/menu/13
+router.register(r"menu", views.MenuViewSet, basename="menu")
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     
@@ -55,15 +62,15 @@ urlpatterns = [
     #                           then redirects, so you won’t necessarily remain on that URL.
     #
     # Endpoint api-auth/ will render a web page welcome message.
-    # Append menu-items to that endpoint and it will launch DRF Browsable API menu-items
+    # Append menu to that endpoint and it will launch DRF Browsable API menu
     # After submitting on /qpi-auth/ , it will auto-redirect to /api-auth/login/
     # Submitting endpoint http://127.0.0.1:8000/api-auth/ will return a 404 Not Found.
     # To clear the 404, append login/ to the end of the URL
     #
     # Example of redirect after login:
-    # http://127.0.0.1:8000/api-auth/login/?next=/api/menu-items/
+    # http://127.0.0.1:8000/api-auth/login/?next=/api/menu/
     # After successful login, redirects to:
-    # http://127.0.0.1:8000/api/menu-items/
+    # http://127.0.0.1:8000/api/menu/
     # To logout, append logout/ to URL.
     
     # http://127.0.0.1:8000/api-auth/logout/ sent back an error.

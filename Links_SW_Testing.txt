@@ -7,7 +7,9 @@ allowed error message in Insomia’s response panel, if they try to violate secu
 
 2.  To retrieve, that is, do a GET to view all or single menu items, but ONLY admin 
 can create, update or delete menu items.  Non-admins will get a Method not allowed 
-error message in menu-items and a 404 Not Found in Booking if users violate security.
+error message in menu and a 404 Not Found in Booking if users violate security.
+
+3.  Test menu and booking endpoints in DRF Browsable API.
 
 ENDPOINT URL LIST To Be Tested:  Tests were done using Insomnia.
 
@@ -23,7 +25,8 @@ the Extra Actions button found in djoser urls.  Auth endpoint puts email first,
 while /api/users/ puts username first.  It will also prevent you from using djoser
 auto-created urls.
 
-Tokens used in Testing: Can be done as Bearer token or by using Header tab in Insomnia
+Tokens used in Testing: Can be done as Bearer token or by using Header tab in Insomnia.
+Authorization token are examples.
 - Account: admin, role admin
 	HEADER Tab:
 		Authorization Token a85fb0ea4c0487a71f0b8032237907c164a231b6
@@ -32,11 +35,11 @@ Tokens used in Testing: Can be done as Bearer token or by using Header tab in In
 
 0.  Register a new user:
 
-       POST 				http://127.0.0.1:8000/api/registration/
+    	POST 				http://127.0.0.1:8000/api/registration/
 
 1.  ADD or Retrieve users: One must use an admin account to do GET, but non-admin can POST a new account.
 
-       GET, POST 			http://127.0.0.1:8000/auth/users/
+    	GET, POST 			http://127.0.0.1:8000/auth/users/
 
 2.  Get single user id=7:
 
@@ -47,25 +50,27 @@ authentication is configured.
 
        POST 				http://127.0.0.1:8000/api/api-token-auth/
 
-4.  Add, display or update Menu Items:
+4.  Add, display or update Menu Items:  Test in Browsable and Insomnia.  Use admin account
+to create, update and delete.  Non-admins can't do that, but they can GET to retrieve
+the menu item list.
 
-       GET, POST  			http://127.0.0.1:8000/api/menu-items/
-       GET, PUT, PATCH, DELETE	http://127.0.0.1:8000/api/menu-items/14/
+       GET, POST  			http://127.0.0.1:8000/api/menu/
+       GET, PUT, PATCH, DELETE	http://127.0.0.1:8000/api/menu/13/
 
 5.  Render to client an HTML 5 Template to display Welcome to Little  Lemon Restaurant 
 and serves static HTML content.
 
-       http://127.0.0.1:8000/api/
+    	http://127.0.0.1:8000/api/
 
-
-6.  Add, display or update bookings:
+6.  Add, display or update bookings:  Test in Browsable and Insomnia.  Use non-admin accounts
+to create, update and delete bookings belonging only to them.  Admins can do everything.
  
-      GET POST http://127.0.0.1:8000/api/booking/
-       GET, PUT, PATCH, DELETE  http://127.0.0.1:8000/api/booking/26/
+    	GET POST http://127.0.0.1:8000/api/booking/
+    	GET, PUT, PATCH, DELETE  http://127.0.0.1:8000/api/booking/26/
 
 7. Do unit testing using Power Shell command in the directory containing manage.py:
 
-python manage.py test
+		python manage.py test
 
 S/W Testing Results:
 
@@ -248,7 +253,7 @@ Used Insomnia to test both APIs.
 MENU	TESTING:
 
 =========================================================================
-Tested menu-items CRUD, authorization and authentication capabilities having  Created, 
+Tested menu CRUD, authorization and authentication capabilities having  Created, 
 retrieved, updated and deleted model instances.  
 
 The non-admin account must not be allowed to add, update or delete menu items.  
@@ -263,12 +268,12 @@ Test admin account first:
 
 Doing the GET is Read Only.
 
-GET  http://127.0.0.1:8000/api/menu-items/
+GET  http://127.0.0.1:8000/api/menu/
 
 JSON Output:  Partial list
 {
 	"count": 9,
-	"next": "http://127.0.0.1:8000/api/menu-items/?page=2",
+	"next": "http://127.0.0.1:8000/api/menu/?page=2",
 	"previous": null,
 	"results": [
 		{
@@ -283,12 +288,12 @@ HTTP Status Code: 200 OK.  9 menu items successfully retrieved.
 Test Result: Passed.
 ------------------------------------------------------------------------------------------------------------------
 
-POST  http://127.0.0.1:8000/api/menu-items/
+POST  http://127.0.0.1:8000/api/menu/
 
 With POST, must check with both an admin and a non-admin account.  The non-admin account 
 must not be allowed to add, update or delete menu items.  Only admin can do that.
 
-Note:  If you click link http://127.0.0.1:8000/api/menu-items/?page=2 in the response panel 
+Note:  If you click link http://127.0.0.1:8000/api/menu/?page=2 in the response panel 
 instead of adding ?page=2 to the input URL box next to the GET button, it will redirect to 
 DRF Browsable API.
 
@@ -313,7 +318,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-GET http://127.0.0.1:8000/api/menu-items/14/
+GET http://127.0.0.1:8000/api/menu/14/
 
 JSON Output
 {
@@ -328,7 +333,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-PUT http://127.0.0.1:8000/api/menu-items/14/
+PUT http://127.0.0.1:8000/api/menu/14/
 
 JSON Before PUT:
 {
@@ -357,7 +362,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-PATCH http://127.0.0.1:8000/api/menu-items/14/ 
+PATCH http://127.0.0.1:8000/api/menu/14/ 
 
 JSON before PATCH
 {
@@ -384,7 +389,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-DELETE http://127.0.0.1:8000/api/menu-items/3/
+DELETE http://127.0.0.1:8000/api/menu/3/
 
 OUTPUT
 No body returned for response
@@ -395,14 +400,14 @@ Test Result: Passed.
 
 
 =========================================================================
-Continue testing endpoint http://127.0.0.1:8000/api/menu-items/ , but with a non-admin account.
+Continue testing endpoint http://127.0.0.1:8000/api/menu/ , but with a non-admin account.
 ------------------------------------------------------------------------------------------------------------------
 
 User: jen.  Is a non-admin account.
 NON-ADMIN Account Authorization Token  283a7b8f3434c716e81f23077116de29bfeab0b9
 =========================================================================
 
-POST http://127.0.0.1:8000/api/menu-items/
+POST http://127.0.0.1:8000/api/menu/
 
 JSON Payload:
 {
@@ -415,19 +420,19 @@ JSON OUTPUT:
 }
 
 HTTP Status Code: 403 Forbidden.  Success: Non-admin accounts were NOT allowed create 
-new menu-items using POST Http Method.  The custom IsAdminOrReadOnly permission worked 
+new menu items using POST Http Method.  The custom IsAdminOrReadOnly permission worked 
 to prevent unauthorized access by non-admins
 
 Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-GET http://127.0.0.1:8000/api/menu-items/
+GET http://127.0.0.1:8000/api/menu/
 
 JSON Output:
 {
 	"count": 11,
-	"next": "http://127.0.0.1:8000/api/menu-items/?page=2",
+	"next": "http://127.0.0.1:8000/api/menu/?page=2",
 	"previous": null,
 	"results": [
 		{
@@ -443,7 +448,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-GET http://127.0.0.1:8000/api/menu-items/14/
+GET http://127.0.0.1:8000/api/menu/14/
 
 JSON Output:
 {
@@ -458,7 +463,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-PUT http://127.0.0.1:8000/api/menu-items/14/
+PUT http://127.0.0.1:8000/api/menu/14/
 
 Update inventory to 31.
 
@@ -479,7 +484,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-PATCH http://127.0.0.1:8000/api/menu-items/14/ 
+PATCH http://127.0.0.1:8000/api/menu/14/ 
 
 JSON INPUT Payload
 {
@@ -497,7 +502,7 @@ Test Result: Passed.
 
 ------------------------------------------------------------------------------------------------------------------
 
-DELETE http://127.0.0.1:8000/api/menu-items/6/
+DELETE http://127.0.0.1:8000/api/menu/6/
 
 JSON OUTPUT
 {
@@ -876,8 +881,8 @@ class MenuViewTest(TestCase):
         MenuItem.objects.create(title="Burger", price="10.00", inventory=20)
 
     def test_getall(self):
-        # Adjust path if yours is different (e.g., "/api/menu-items/")
-        response = self.client.get("/api/menu-items/")
+        # Adjust path if yours is different (e.g., "/api/menu/")
+        response = self.client.get("/api/menu/")
 
         # compares response status code with expected code 200 OK
         self.assertEqual(response.status_code, 200)
@@ -923,3 +928,5 @@ Test Result: Passed.  OK displayed, Unit Testing resulted in no errors found.
 
 Yes, s/w testing confirmed that all endpoints were successfully tested using Insomnia REST client.
 
+
+https://github.com/Codem-3/Little-Lemon-a

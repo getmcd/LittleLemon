@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import  Booking, MenuItem
+from .models import  Booking, Menu
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
        
-class MenuItemSerializer(serializers.ModelSerializer):
+class MenuSerializer(serializers.ModelSerializer):
     # price cannot be less than $2
     # This validation technique only works in DRF, not Admin Panel
     # Best to do validation in Models.py to apply to both
@@ -69,7 +69,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
     # # Inventory must be greater than 0
     # inventory = serializers.IntegerField(min_value=1)
     class Meta:
-        model  = MenuItem
+        model  = Menu
         fields = ['id', 'title', 'price', 'inventory']
 
 # Make sure clients can’t submit user in JSON and assign bookings to someone else.
