@@ -1,11 +1,11 @@
 # Create your tests here.
 from django.test import TestCase
-from restaurant.models import MenuItem
+from restaurant.models import Menu
 
 # TestCase class
-class MenuItemTest(TestCase):
+class MenuTest(TestCase):
     def test_get_item(self):
-        item = MenuItem.objects.create(title="IceCream", price=80, inventory=100)
+        item = Menu.objects.create(title="IceCream", price=80, inventory=100)
         self.assertEqual(str(item), "IceCream : 80.00")
 
 # Test Log:

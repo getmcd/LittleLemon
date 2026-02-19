@@ -22,10 +22,9 @@ from rest_framework.permissions import (
     )
 from rest_framework.response import Response
 
-from .models import Booking, MenuItem
-from .serializers import UserSerializer, BookingSerializer, MenuItemSerializer
+from .models import Booking, Menu
+from .serializers import UserSerializer, BookingSerializer, MenuSerializer
 from .permissions import IsAdminOrReadOnly, IsOwnerOrAdmin
-from .models import MenuItem
 
 # {} means render page with no dynamic data, meaning: empty dictionary.
 def index(request):
@@ -50,15 +49,10 @@ class RegistrationView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-class MenuItemsView(generics.ListCreateAPIView):
+class MenuViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
-    queryset = MenuItem.objects.all().order_by("title")
-    serializer_class = MenuItemSerializer
-
-class SingleMenuItemView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView):    
-    permission_classes = [IsAdminOrReadOnly] 
-    queryset = MenuItem.objects.all().order_by("title") 
-    serializer_class = MenuItemSerializer
+    queryset = Menu.objects.all().order_by("title")
+    serializer_class = MenuSerializer
 
 # This enforces:
 # GET list: user sees only their bookings

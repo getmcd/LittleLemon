@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.contrib.admin.widgets import AdminSplitDateTime
-from .models import MenuItem, Booking
+from .models import Menu, Booking
 
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
@@ -30,8 +30,8 @@ class CustomUserAdmin(UserAdmin):
     ordering = ("username",)  # force ordering in admin list view
 
 # MenuItem Admin
-@admin.register(MenuItem)
-class MenuItemAdmin(admin.ModelAdmin):
+@admin.register(Menu)
+class MenuAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "price", "inventory")
     list_filter = ("title",)
     search_fields = ("title",)
@@ -73,42 +73,3 @@ class BookingAdmin(admin.ModelAdmin):
         models.DateTimeField: {"widget": AdminSplitDateTime()},
     }
 
-
-
-# from django.contrib import admin
-# from django.db import models
-
-# from .models import MenuItem, Booking
-
-# # import ability to select both date and time in DRF API Viewer
-# from django.contrib.admin.widgets import AdminSplitDateTime
-
-# # 1. Define the Admin Class
-# class MenuItemAdmin(admin.ModelAdmin):
-#     list_display = ("id", "title", "price", "inventory")
-#     list_filter = ['title']
-
-# # class BookingAdmin(admin.ModelAdmin):
-# #     list_display = ("id", "name", "number_of_guests", "booking_date")
-# #     list_filter = ['name']
-
-
-# @admin.register(Booking)
-# class BookingAdmin(admin.ModelAdmin):
-#     formfield_overrides = {
-#         models.DateTimeField: {"widget": AdminSplitDateTime()},
-#     }
-
-# # Register them at the bottom
-# admin.site.register(MenuItem, MenuItemAdmin)
-# # admin.site.register(Booking, BookingAdmin)
-
-# # Important
-# # For the HTML Form (Meta course assignment): If you are building 
-# # an HTML form manually, make sure your <input> tag is set to datetime-local:
-# # <input type="datetime-local" id="booking_date" name="booking_date">
-    
-    
-
-    
-        

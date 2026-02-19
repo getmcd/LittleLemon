@@ -25,7 +25,7 @@ from django.conf import settings
 #     def __str__(self):
 #         return self.title   # 👈 this controls how it appears in admin dropdowns & FK fields
 
-class MenuItem(models.Model):
+class Menu(models.Model):
     title = models.CharField(max_length=255)   
     price = models.DecimalField(
         max_digits=6,
@@ -85,8 +85,8 @@ class Booking(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="bookings",
-        # null=True,      # 👈 temp add
-        # blank=True      # 👈 temp add
+        # null=True,      # temp add
+        # blank=True      # temp add
     )
     
     name = models.CharField(max_length=255, db_index=True)
@@ -101,5 +101,5 @@ class Booking(models.Model):
     # datetime.now() grabs the system clock time without tSimezone info
     #booking_date = models.DateTimeField(default=datetime.now) 
     def __str__(self):
-        return self.name   # 👈 this controls how it appears in admin dropdowns & FK fields    
+        return self.name   # this controls how it appears in admin dropdowns & FK fields    
     
